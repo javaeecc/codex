@@ -1,0 +1,32 @@
+server:
+  port: 88
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: codex-dashboard-web
+          uri: ${codex.gateway.dashboard-base-url}
+          predicates:
+            - Path=/dashboard,/dashboard/**,/terms,/js/**,/css/**,/fonts/**,/favicon.ico
+        - id: codex-api-web
+          uri: ${codex.gateway.upstream-base-url}
+          predicates:
+            - Path=/api/**
+        - id: codex-api-v1
+          uri: ${codex.gateway.upstream-base-url}
+          predicates:
+            - Path=/v1/**
+          filters:
+            - PrefixPath=/api
+
+codex:
+  gateway:
+    upstream-base-url: http://api.javaee.cc
+    dashboard-base-url: http://api.javaee.cc
+    site:
+      invite-code-file: invite-code.txt
+
+logging:
+  level:
+    cc.javaee.gateway: info

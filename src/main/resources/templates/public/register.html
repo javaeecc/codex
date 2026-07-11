@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${'注册 - '+siteName}"></title>
+  <meta name="description" th:content="${'注册 - '+siteName}">
+  <meta name="keywords" th:content="${'注册 - '+siteName}">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="canonical" href="/register">
+  <link rel="stylesheet" th:href="@{/public-pages.css}">
+</head>
+<body>
+<div class="auth-page">
+  <main class="auth-shell">
+    <a class="auth-brand" href="/">
+      <img class="brand-logo" th:if="${websiteImageBase64}" th:src="${websiteImageBase64}" th:alt="${siteName}">
+      <strong>创建账户</strong>
+    </a>
+
+    <section class="auth-card">
+
+      <div id="register-alert" class="page-alert error"></div>
+
+      <form id="register-form" class="auth-form">
+        <div class="field-group">
+          <label for="register-email">邮箱</label>
+          <input id="register-email" class="field-input" type="email" autocomplete="email" placeholder="请输入邮箱">
+        </div>
+        <div class="field-group">
+          <label for="register-password">密码</label>
+          <input id="register-password" class="field-input" type="password" autocomplete="new-password" placeholder="创建一个安全的密码">
+        </div>
+        <div class="field-group">
+          <label for="register-captcha">验证码</label>
+          <div class="captcha-row">
+            <input id="register-captcha" class="field-input" type="text" maxlength="4" placeholder="请输入 4 位验证码">
+            <button id="register-captcha-refresh" class="captcha-image" type="button" title="点击刷新验证码">
+              <img id="register-captcha-image" alt="验证码">
+            </button>
+          </div>
+        </div>
+        <p class="auth-help">验证码为 4 位 1-9 数字，点击图片可刷新。</p>
+        <label class="checkbox-row">
+          <input id="register-agreed" type="checkbox" checked>
+          <span>我已阅读并同意 <a href="/terms">服务条款</a></span>
+        </label>
+        <div class="auth-actions">
+          <button id="register-submit" class="site-button site-button-primary auth-submit" type="submit">创建账户</button>
+        </div>
+        <button id="register-login-button" class="site-button auth-secondary" type="button">已有账户，去登录</button>
+      </form>
+    </section>
+
+    <div class="auth-links">
+      <a href="/">返回首页</a>
+      <span>已有账户？<a href="/login">登录</a></span>
+    </div>
+    <p class="auth-copy">© 2026 Codex API. 保留所有权利。</p>
+  </main>
+</div>
+
+<script th:inline="javascript">
+  window.PUBLIC_PAGE_CONFIG = {
+    apiBaseUrl: '/api',
+    dashboardPath: '/dashboard'
+  };
+</script>
+<script>
+  (function () {
+    const LOGIN_STORAGE_KEY = 'codex-api-login-user';
+    const TOKEN_STORAGE_KEY = 'codex-api-auth-token';
+    const LAST_EMAIL_STORAGE_KEY = 'codex-api-last-email';
+    const config = window.PUBLIC_PAGE_CONFIG;
+    const alertBox = document.getElementById('register-alert');
+    const form = document.getElementById('register-form');
+    const submitButton = document.getElementById('register-submit');
+    const captchaImage = document.getElementById('register-captcha-image');
+    let captchaId = '';
+
+    function showError(message) {
+      alertBox.textContent = message;
+      alertBox.className = 'page-alert error show';
+    }
+
+    function clearError() {
+      alertBox.textContent = '';
+      alertBox.className = 'page-alert error';
+    }
+
+    function setSubmitting(submitting) {
+      submitButton.disabled = submitting;
+      submitButton.textContent = submitting ? '注册中...' : '创建账户';
+    }
+
+    function loadCaptcha() {
+      fetch(config.apiBaseUrl + '/auth/captcha')
+        .then(function (response) { return response.json(); })
+        .then(function (payload) {
+          if (!payload || payload.code !== 0 || !payload.data) {
+            throw new Error(payload && payload.message ? payload.message : '验证码加载失败');
+          }
+          captchaId = payload.data.captchaId || '';
+          captchaImage.src = payload.data.imageBase64 || '';
+          document.getElementById('register-captcha').value = '';
+        })
+        .catch(function () {
+          showError('验证码加载失败，请稍后重试');
+        });
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      clearError();
+
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const captchaCode = document.getElementById('register-captcha').value.trim();
+      const agreed = document.getElementById('register-agreed').checked;
+
+      if (!email) {
+        showError('请输入邮箱');
+        return;
+      }
+      if (!password || password.length < 6) {
+        showError('请输入至少 6 位密码');
+        return;
+      }
+      if (!/^[1-9]{4}$/.test(captchaCode)) {
+        showError('验证码为 4 位 1-9 数字');
+        return;
+      }
+      if (!agreed) {
+        showError('请先同意服务条款');
+        return;
+      }
+
+      setSubmitting(true);
+      fetch('/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          captchaId: captchaId,
+          captchaCode: captchaCode
+        })
+      })
+        .then(function (response) { return response.json(); })
+        .then(function (payload) {
+          if (!payload || payload.code !== 0 || !payload.data) {
+            throw new Error(payload && payload.message ? payload.message : '注册失败');
+          }
+          localStorage.setItem(LOGIN_STORAGE_KEY, payload.data.email);
+          localStorage.setItem(TOKEN_STORAGE_KEY, payload.data.token);
+          localStorage.setItem(LAST_EMAIL_STORAGE_KEY, payload.data.email);
+          window.location.href = config.dashboardPath;
+        })
+        .catch(function (error) {
+          showError(error.message || '注册失败，请检查后端服务');
+          loadCaptcha();
+        })
+        .finally(function () {
+          setSubmitting(false);
+        });
+    });
+
+    document.getElementById('register-email').value = localStorage.getItem(LAST_EMAIL_STORAGE_KEY) || '';
+    document.getElementById('register-captcha-refresh').addEventListener('click', loadCaptcha);
+    document.getElementById('register-login-button').addEventListener('click', function () {
+      window.location.href = '/login';
+    });
+    loadCaptcha();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${siteName}"></title>
+  <meta name="description" th:content="${metaDescription}">
+  <meta name="keywords" th:content="${metaKeywords}">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="/">
+  <link rel="stylesheet" th:href="@{/public-pages.css}">
+</head>
+<body>
+<div class="home-page">
+  <header class="site-header">
+    <a class="brand" href="/">
+      <img class="brand-logo" th:if="${websiteImageBase64}" th:src="${websiteImageBase64}" th:alt="${siteName}">
+      <span>
+        <strong th:text="${siteName}">Codex API</strong>
+        <em>codex API 中转服务</em>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="top navigation">
+      <button id="register-button" class="site-button site-button-secondary" type="button">立即注册</button>
+      <button id="console-button" class="site-button site-button-primary" type="button">登录控制台</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-section">
+      <div class="hero-copy">
+        <h1>
+          <span>Codex API</span>
+          <span>中转服务</span>
+        </h1>
+        <p class="hero-lead">
+          <span>让 Codex 工作流</span>
+          <span>更稳定高效</span>
+        </p>
+        <p class="hero-desc">
+          面向日常编码场景，提供统一接入、额度用量、账单与安全设置管理。
+        </p>
+
+        <div class="quick-cards">
+          <article class="quick-card">
+            <span>接入</span>
+            <strong>一键使用</strong>
+            <p>登录后可查看接入信息，并快速进入个人控制台。</p>
+          </article>
+          <article class="quick-card">
+            <span>成本</span>
+            <strong>按需管理</strong>
+            <p>集中查看额度、用量与账单，便于控制团队使用成本。</p>
+          </article>
+          <article class="quick-card">
+            <span>稳定</span>
+            <strong>长期可用</strong>
+            <p>通过统一控制台管理服务状态与安全设置。</p>
+          </article>
+        </div>
+
+        <div class="hero-actions">
+          <button id="hero-register-button" class="site-button site-button-secondary" type="button">立即注册</button>
+          <button id="hero-console-button" class="site-button site-button-primary" type="button">登录控制台</button>
+        </div>
+      </div>
+
+      <aside class="workflow-panel" aria-label="Codex API 工作流概览">
+        <div class="panel-title">
+          <span></span>
+          <strong>Codex API 工作台</strong>
+        </div>
+        <div class="flow-line">
+          <b>Codex</b>
+          <i></i>
+          <b>统一管理</b>
+          <i></i>
+          <b>工作台</b>
+        </div>
+        <div class="metric-grid">
+          <article class="metric-item">
+            <span>接入状态</span>
+            <strong>清晰可见</strong>
+          </article>
+          <article class="metric-item">
+            <span>额度用量</span>
+            <strong>集中管理</strong>
+          </article>
+          <article class="metric-item">
+            <span>响应体验</span>
+            <strong>稳定优先</strong>
+          </article>
+          <article class="metric-item">
+            <span>数据分析</span>
+            <strong>按需追踪</strong>
+          </article>
+        </div>
+        <p class="panel-note">登录后可进入仪表盘，管理 API 密钥、额度、用量与账户信息。</p>
+      </aside>
+    </section>
+
+    <section class="feature-section">
+      <div class="section-heading">
+        <h2>为什么选择 Codex API</h2>
+        <p>专为日常编码场景设计，帮助每一次调用都更稳定、清晰、可控。</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span>01</span>
+          <h3>一键接入</h3>
+          <p>将密钥和接口信息集中管理，减少重复配置。</p>
+        </article>
+        <article class="feature-card">
+          <span>02</span>
+          <h3>更低成本</h3>
+          <p>按需使用与按量管理，帮助团队更清晰地控制成本。</p>
+        </article>
+        <article class="feature-card">
+          <span>03</span>
+          <h3>高稳定性</h3>
+          <p>通过统一服务管理与状态展示，为长时间编码会话提供支撑。</p>
+        </article>
+        <article class="feature-card">
+          <span>04</span>
+          <h3>集中管理</h3>
+          <p>统一管理密钥、额度、用量与账单，减少分散维护成本。</p>
+        </article>
+        <article class="feature-card">
+          <span>05</span>
+          <h3>低延迟体验</h3>
+          <p>关注响应速度和可用性，让编码过程中的等待更少。</p>
+        </article>
+        <article class="feature-card">
+          <span>06</span>
+          <h3>详细数据分析</h3>
+          <p>按模型、接口、时间追踪用量，帮助掌握每一次调用。</p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="brand compact">
+      <img class="brand-logo" th:if="${websiteImageBase64}" th:src="${websiteImageBase64}" th:alt="${siteName}">
+      <span>
+        <strong>Codex API</strong>
+        <em>统一、清晰的服务管理</em>
+      </span>
+    </div>
+  </footer>
+</div>
+
+<script th:inline="javascript">
+  window.PUBLIC_PAGE_CONFIG = {
+    dashboardPath: '/dashboard',
+  };
+</script>
+<script>
+  (function () {
+    const LOGIN_STORAGE_KEY = 'codex-api-login-user';
+    const TOKEN_STORAGE_KEY = 'codex-api-auth-token';
+    const config = window.PUBLIC_PAGE_CONFIG;
+    const registerButton = document.getElementById('register-button');
+    const consoleButton = document.getElementById('console-button');
+    const heroConsoleButton = document.getElementById('hero-console-button');
+    const heroRegisterButton = document.getElementById('hero-register-button');
+
+    function isLoggedIn() {
+      return Boolean(localStorage.getItem(LOGIN_STORAGE_KEY) && localStorage.getItem(TOKEN_STORAGE_KEY));
+    }
+
+    function updateButtons() {
+      const loggedIn = isLoggedIn();
+      const label = loggedIn ? '进入控制台' : '登录控制台';
+      consoleButton.textContent = label;
+      heroConsoleButton.textContent = label;
+      registerButton.hidden = loggedIn;
+      heroRegisterButton.hidden = loggedIn;
+    }
+
+    function goConsole() {
+      window.location.href = isLoggedIn() ? config.dashboardPath : '/login';
+    }
+
+    function goRegister() {
+      window.location.href = '/register';
+    }
+
+    registerButton.addEventListener('click', goRegister);
+    consoleButton.addEventListener('click', goConsole);
+    heroConsoleButton.addEventListener('click', goConsole);
+    heroRegisterButton.addEventListener('click', goRegister);
+    updateButtons();
+  })();
+</script>
+</body>
+</html>

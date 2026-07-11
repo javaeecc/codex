@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>500 - 服务暂时不可用</title>
+  <link rel="stylesheet" th:href="@{/public-pages.css}">
+</head>
+<body>
+<div class="auth-page error-page">
+  <main class="error-shell">
+    <div class="error-code">500</div>
+    <h1>服务暂时不可用</h1>
+    <p>服务器遇到暂时问题，请稍后重试。</p>
+    <div class="error-actions">
+      <a class="site-button site-button-primary" href="/">返回首页</a>
+      <button class="site-button auth-secondary" type="button" onclick="window.location.reload()">重新加载</button>
+    </div>
+  </main>
+</div>
+</body>
+</html>

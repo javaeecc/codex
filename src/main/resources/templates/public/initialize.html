@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>初始化网关</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/public-pages.css">
+</head>
+<body>
+<div class="auth-page">
+  <main class="auth-shell">
+    <a class="auth-brand" href="/initialize">
+      <strong>Codex API 网关初始化</strong>
+    </a>
+
+    <section class="auth-card">
+      <div class="auth-heading">
+        <h1>登录管理员账号</h1>
+        <p>首次启动需要绑定管理员账号，完成后会自动保存平台 Key。</p>
+      </div>
+
+      <div id="initialize-alert" class="page-alert error"></div>
+
+      <form id="initialize-form" class="auth-form">
+        <div class="field-group">
+          <label for="initialize-email">管理员邮箱</label>
+          <input id="initialize-email" class="field-input" type="email" autocomplete="username" placeholder="请输入管理员邮箱">
+        </div>
+        <div class="field-group">
+          <label for="initialize-password">密码</label>
+          <input id="initialize-password" class="field-input" type="password" autocomplete="current-password" placeholder="请输入管理员密码">
+        </div>
+        <div class="field-group">
+          <label for="initialize-captcha">验证码</label>
+          <div class="captcha-row">
+            <input id="initialize-captcha" class="field-input" type="text" maxlength="4" placeholder="请输入 4 位验证码">
+            <button id="initialize-captcha-refresh" class="captcha-image" type="button" title="点击刷新验证码">
+              <img id="initialize-captcha-image" alt="验证码">
+            </button>
+          </div>
+        </div>
+        <p class="auth-help">验证码为 4 位 1-9 数字，点击图片可刷新。</p>
+        <div class="auth-actions">
+          <button id="initialize-submit" class="site-button site-button-primary auth-submit" type="submit">登录并初始化</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="auth-links">
+      <span>没有管理员账号？请先在<a href="http://admin.javaee.cc/" target="_blank" rel="noopener noreferrer">管理端创建</a>。</span>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const alertBox = document.getElementById('initialize-alert');
+    const form = document.getElementById('initialize-form');
+    const submitButton = document.getElementById('initialize-submit');
+    const captchaImage = document.getElementById('initialize-captcha-image');
+    let captchaId = '';
+
+    function showError(message) {
+      alertBox.textContent = message;
+      alertBox.className = 'page-alert error show';
+    }
+
+    function clearError() {
+      alertBox.textContent = '';
+      alertBox.className = 'page-alert error';
+    }
+
+    function loadCaptcha() {
+      fetch('/api/admin/auth/captcha')
+        .then(function (response) { return response.json(); })
+        .then(function (payload) {
+          if (!payload || payload.code !== 0 || !payload.data) {
+            throw new Error(payload && payload.message ? payload.message : '验证码加载失败');
+          }
+          captchaId = payload.data.captchaId || '';
+          captchaImage.src = payload.data.imageBase64 || '';
+          document.getElementById('initialize-captcha').value = '';
+        })
+        .catch(function () {
+          showError('验证码加载失败，请稍后重试');
+        });
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      clearError();
+
+      const email = document.getElementById('initialize-email').value.trim();
+      const password = document.getElementById('initialize-password').value;
+      const captchaCode = document.getElementById('initialize-captcha').value.trim();
+      if (!email) {
+        showError('请输入管理员邮箱');
+        return;
+      }
+      if (!password || password.length < 6) {
+        showError('请输入至少 6 位密码');
+        return;
+      }
+      if (!/^[1-9]{4}$/.test(captchaCode)) {
+        showError('验证码为 4 位 1-9 数字');
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = '初始化中...';
+      fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          captchaId: captchaId,
+          captchaCode: captchaCode
+        })
+      })
+        .then(function (response) { return response.json(); })
+        .then(function (payload) {
+          if (!payload || payload.code !== 0 || !payload.data || !payload.data.token) {
+            throw new Error(payload && payload.message ? payload.message : '管理员登录失败');
+          }
+          return fetch('/initialize/invite-code', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + payload.data.token }
+          });
+        })
+        .then(function (response) {
+          return response.json().then(function (payload) {
+            if (!response.ok || !payload || payload.code !== 0) {
+              throw new Error(payload && payload.message ? payload.message : '网关初始化失败');
+            }
+            return payload;
+          });
+        })
+        .then(function () {
+          window.location.href = '/';
+        })
+        .catch(function (error) {
+          showError(error.message || '初始化失败，请稍后重试');
+          loadCaptcha();
+        })
+        .finally(function () {
+          submitButton.disabled = false;
+          submitButton.textContent = '登录并初始化';
+        });
+    });
+
+    document.getElementById('initialize-captcha-refresh').addEventListener('click', loadCaptcha);
+    loadCaptcha();
+  })();
+</script>
+</body>
+</html>

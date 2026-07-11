@@ -1,0 +1,8 @@
+target/
+invite-code.txt
+invite-code.txt.tmp
+web/node/
+web/node_modules/
+web/dist/
+.idea/
+.vscode/
