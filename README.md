@@ -41,3 +41,6 @@ codex:
 - Spring Boot 2.7.x
 - Spring Cloud Gateway
 - Vue 2.x
+
+技术QQ群：747172607
+
