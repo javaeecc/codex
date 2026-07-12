@@ -23,17 +23,6 @@ java -jar target/*.jar
 
 ## 配置说明
 
-如需修改上游服务地址，可以编辑 `src/main/resources/application.yml`：
-
-```yaml
-codex:
-  gateway:
-    upstream-base-url: http://api.javaee.cc
-    dashboard-base-url: http://api.javaee.cc
-```
-
-- `upstream-base-url`：API 服务地址。
-- `dashboard-base-url`：前端页面服务地址。
 - `site.invite-code-file`：平台 key 文件名，默认是启动工作目录下的 `invite-code.txt`。
 
 ## 技术栈
@@ -43,4 +32,8 @@ codex:
 - Vue 2.x
 
 技术QQ群：747172607
+
+演示站点：
+用户前台：https://javaee.cc
+管理员后台：http://admin.javaee.cc
 
