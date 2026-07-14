@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +36,8 @@ public class RegistrationController {
     @PostMapping(value = "/auth/register",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<JsonNode>> register(@RequestBody ObjectNode requestBody) {
+    public Mono<ResponseEntity<JsonNode>> register(@RequestBody ObjectNode requestBody,
+                                                   ServerHttpRequest request) {
         String inviteCode = sitePageProperties.getInviteCode();
         if (!StringUtils.hasText(inviteCode)) {
             return Mono.just(errorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -47,7 +49,7 @@ public class RegistrationController {
                 : requestBody.deepCopy();
         forwardedRequest.put("inviteCode", inviteCode.trim());
 
-        return registrationProxyClient.register(forwardedRequest)
+        return registrationProxyClient.register(forwardedRequest, request)
                 .onErrorResume(ex -> Mono.just(errorResponse(HttpStatus.BAD_GATEWAY.value(),
                         "Registration service is unavailable")));
     }
